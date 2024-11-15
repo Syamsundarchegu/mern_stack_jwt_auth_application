@@ -3,11 +3,13 @@ import { Link } from "react-router-dom";
 import "../Navbar.css";
 import { store } from "../index";
 import { useContext } from "react";
+import { Navigate } from "react-router-dom";
 
 const Navbar = () => {
   const [token, setToken] = useContext(store);
   function logout() {
     setToken(null);
+    return <Navigate to="/login" />;
   }
   return (
     <div className="container">

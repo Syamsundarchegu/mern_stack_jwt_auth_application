@@ -3,12 +3,18 @@ import Navbar from "./Navbar";
 import { store } from "../index";
 import { Navigate } from "react-router";
 import axios from "axios";
+import emailjs from "emailjs-com";
 
 const Home = () => {
   const context = useContext(store);
   const [data, setData] = useState(null);
   const [token, SetToken] = context;
-  // If context is not available, return an error or fallback
+  const [form_data, setform_data] = useState({
+    subject: "",
+    user_email: "",
+    message: "",
+  });
+
   if (!context) {
     console.log(
       "Context is undefined. Ensure the provider is wrapped around this component."
@@ -38,11 +44,67 @@ const Home = () => {
     return <Navigate to="/login" />;
   }
 
+  const handleChange = (e) => {
+    setform_data({ ...form_data, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    emailjs
+      .send(
+        "service_1ucj7ms",
+        "template_gn1tso5",
+        form_data,
+        "YgRlGfr5byoi2MjAE"
+      )
+      .then(
+        () => {
+          console.log("Email sent!");
+          setform_data({
+            subject: "",
+            user_email: "",
+            message: "",
+          });
+        },
+        (err) => {
+          console.error("Failed to send email:", err);
+        }
+      );
+    setform_data({
+      subject: "",
+      user_email: "",
+      message: "",
+    });
+  };
+
   return (
     <div>
       <Navbar />
-      <h1>Welcome to Home</h1>
-      <p>{data ? `Hello, ${data.message.username}` : "Loading data..."}</p>
+      <p>{data ? `Hello, ${data?.message?.username}` : "Loading data..."}</p>
+      <form onSubmit={handleSubmit}>
+        <label>Subject</label>
+        <input
+          type="text"
+          name="subject"
+          value={form_data.subject}
+          onChange={handleChange}
+        required/>
+        <label>Email</label>
+        <input
+          type="email"
+          name="user_email"
+          value={form_data.user_email}
+          onChange={handleChange}
+        required/>
+        <label>Message</label>
+        <input
+          type="text"
+          name="message"
+          value={form_data.message}
+          onChange={handleChange}
+        required/>
+        <input type="submit" value="Send" className="button" />
+      </form>
     </div>
   );
 };
